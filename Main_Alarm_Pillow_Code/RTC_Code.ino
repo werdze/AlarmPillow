@@ -1,6 +1,6 @@
 // DS3231_Serial_Hard
 // Copyright (C)2015 Rinky-Dink Electronics, Henning Karlsen. All right reserved
-// web: http://www.RinkyDinkElectronics.com/
+// web: http://www.rinkydinkelectronics.com/library.php?id=73
 //
 // A quick demo of how to use my DS3231-library to 
 // retrieve time- and date-data for you to manipulate.
