@@ -58,6 +58,31 @@ void setCurrHourAndMinsForAlarm(int alarmNum) {
   currMinSecondDigit = currMin % 10;
 }
 
+int getCurrHourFromTime(String timeStr){
+  if(timeStr.charAt(2) == ':'){
+    return timeStr.substring(0,2).toInt();
+  }
+  else{
+    return timeStr.substring(0,1).toInt();
+  } 
+}
+
+int getCurrMinFromTime(String timeStr){
+  if(timeStr.charAt(2) == ':' && timeStr.charAt(5) == ':'){
+    return timeStr.substring(3,5).toInt();
+  }
+  else if(timeStr.charAt(2) == ':' && timeStr.charAt(4) == ':'){
+    return timeStr.substring(3,4).toInt();
+  }
+  else if(timeStr.charAt(1) == ':' && timeStr.charAt(4) == ':'){
+    return timeStr.substring(2,4).toInt();
+  }
+  else{
+    return timeStr.substring(2,3).toInt();
+  }
+  
+}
+
 bool checkIfButtonIsA1Activate() {
   if(currPageIdx == ALARMPAGE && currLineSelected == SETA1ACTIVESTATUS) {
     alarm1Active = alarm1Active ? false : true;
@@ -129,4 +154,14 @@ void resetCurrTimes() {
   currHourSecondDigit = 0;
   currMinFirstDigit = 0;
   currMinSecondDigit = 0;
+}
+
+void turnOnVibrations() {
+  digitalWrite(5, HIGH);
+  digitalWrite(6, HIGH);
+}
+
+void turnOffVibrations() {
+  digitalWrite(5, LOW);
+  digitalWrite(6, LOW);
 }

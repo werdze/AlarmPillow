@@ -40,6 +40,8 @@ String currDateShortened;
 String currTimeShortened;
 String prevCurrTimeShortened;
 bool hourOrMinChanged = false;
+int secondsVibrationMotorsActive = 0;
+int maxVibrationDuration = 10;
 
 int8_t myAlarmTimes[6] = {-1, -1, -1, -1, -1, -1}; // hour, then minute, for 3 alarms
 int maxlineSelectionForPage[4];
@@ -69,7 +71,7 @@ bool alarm3Repeat = false;
 
 void setup() {
   Serial.begin(115200);
-  powerToLCDAndJoystick();
+  powerToLCDAndJoystickAndVibrationMotorsSetup();
   JoystickSetup();
   RTCsetup();
   setCurrTime(23, 59, 50, 12, 12, 2019);  // H, M, S, Month, Day, Year
@@ -77,6 +79,7 @@ void setup() {
 //  setAlarm(1, -1, -1);  // alarm #, H, M
   getAlarmsAndUpdateMyAlarmsArr();
   delay(100);
+  alarm1Active = true;    // just for testing purposes
   LCDsetup();
   prevMillis = millis();
   
@@ -93,15 +96,21 @@ void setup() {
   Serial.println("myAlarmTimes[0 and 1] Here:");
   Serial.println(myAlarmTimes[0]);
   Serial.println(myAlarmTimes[1]);
-  
+
+  delay(1000);  // allow enough time to read from memory
 }
 
 void loop() {
   // Get data from the DS3231
 //  lcd.cursor();
   if(millis() - prevMillis > 1000){
+    secondsVibrationMotorsActive++;
+    Serial.println("secondsVibrationMotorsActive: " + String(secondsVibrationMotorsActive));
     prevCurrTimeShortened = currTimeShortened;
     getTimeStrings(currDate, currTime, currDateShortened, currTimeShortened);
+//    Serial.println(currTime);
+//    Serial.println(currTime.substring(0,2));
+//    Serial.println(currTime.substring(3,5));
 //    Serial.println(currDate + " " + currTime);
 //    Serial.println(currDateShortened + " " + currTimeShortened);
     LcdSetDateTime();
@@ -121,9 +130,32 @@ void loop() {
   else{
     lcd.noBlink();
   }
+  int currHour = getCurrHourFromTime(currTime);
+  int currMin = getCurrMinFromTime(currTime);
+//  Serial.println(currHour);
+//  Serial.println("My alarm 1 time");
+//  Serial.println(myAlarmTimes[0]);
+//  Serial.println(myAlarmTimes[1]);
+  if(alarm1Active && myAlarmTimes[0] == currHour && myAlarmTimes[1] == currMin){
+    secondsVibrationMotorsActive = 0;
+    //activate alarm for the day
+    Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    turnOnVibrations();
+    alarm1Active = false;
+    LcdSetAlarmLines();         // TODO Fix this later so that the S after A1 clears out, unless it is on Repeat
+    LcdClearLines(0);
+    LcdDisplayCurrLines();
+  }
+  if(secondsVibrationMotorsActive == maxVibrationDuration){
+    Serial.println("Turning Vibrations Off");
+    turnOffVibrations();
+  }
+  
 }
 
-void powerToLCDAndJoystick() {
+void powerToLCDAndJoystickAndVibrationMotorsSetup() {
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
   pinMode(12, OUTPUT);    // sets the digital pin 12 as output
   pinMode(13, OUTPUT);
   digitalWrite(12, HIGH); // sets the digital pin 12 on

@@ -46,9 +46,9 @@ void LCDloop() {
 //  lcd.print(currTime);
 }
 
-void LcdClearLines(int where) {
+void LcdClearLines(int where) {   // for testing purposes - replace with lcd.clear() later
   lcd.clear();
-  Serial.println("Cleared Lines" + String(where));
+//  Serial.println("Cleared Lines" + String(where));
 }
 
 void LcdDisplayCurrLines() {
